@@ -10,38 +10,50 @@ bot = telebot.TeleBot(f"{BOT_TOKEN}")
 
 # Define the group chat ID
 group_chat_id = f'{GROUP_CHAT_ID}'
-
-# Define a dictionary of hashtags and their corresponding topics
-topics = {'#Metal': 'Metal',
-          '#Hard_Rock': 'Hard Rock',
-          '#Country': 'Country'}
+# Define a dictionary of hashtags and their corresponding genres
+genres = {'#pop': 'Pop',
+          '#rock': 'Rock',
+          '#rap': 'Rap',
+          '#country': 'Country'}
 
 # Define a function to extract the hashtags from a message
 def extract_hashtags(message):
     hashtags = re.findall(r'\#\w+', message.text)
     return hashtags
 
-# Define a function to sort messages based on their hashtags
-def sort_messages(message):
+# Define a handler for messages in the "sorting" group
+@bot.message_handler(func=lambda message: message.chat.type == 'supergroup' and message.chat.title == 'sorting')
+def handle_sorting_message(message):
+    # Extract hashtags and song name from the message
     hashtags = extract_hashtags(message)
+    song_name = message.text
+
+    # If the message contains a song name, use it to determine the genre
+    if song_name:
+        for genre, keywords in genres.items():
+            if any(keyword in song_name.lower() for keyword in keywords.split()):
+                hashtags.append(genre)
+
+    # If there are no hashtags or genres, ignore the message
+    if not hashtags:
+        return
+
+    # Sort messages based on hashtags and genres
     sorted_messages = {}
     for hashtag in hashtags:
-        if hashtag in topics:
-            topic = topics[hashtag]
-            if topic in sorted_messages:
-                sorted_messages[topic].append(message.text)
-            else:
-                sorted_messages[topic] = [message.text]
-    return sorted_messages
+        if hashtag in genres:
+            topic = genres[hashtag]
+        else:
+            topic = hashtag
+        if topic in sorted_messages:
+            sorted_messages[topic].append(message.text)
+        else:
+            sorted_messages[topic] = [message.text]
 
-# Define a handler for messages in the "general" topic
-@bot.message_handler(func=lambda message: message.chat.type == 'supergroup' and message.chat.title == 'general')
-def handle_general_message(message):
-    sorted_messages = sort_messages(message)
-    if sorted_messages:
-        for topic, messages in sorted_messages.items():
-            message_text = f'#{topic}\n\n' + '\n\n'.join(messages)
-            bot.send_message(group_chat_id, message_text)
+    # Send the sorted messages to the user who requested the songs
+    for topic, messages in sorted_messages.items():
+        message_text = f'#{topic}\n\n' + '\n\n'.join(messages)
+        bot.send_message(message.chat.id, message_text)
 
 # Start the bot
 bot.polling()
