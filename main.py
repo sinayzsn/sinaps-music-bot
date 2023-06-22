@@ -10,6 +10,9 @@ from telegram.ext import (
 import logging
 import env as KEY
 from typing import Final
+import os
+from pydub import AudioSegment
+from pydub.utils import mediainfo
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO, filename='bot.log'
@@ -130,6 +133,34 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(help_msg)
 
 
+def audio_info(update, context):
+    audio = update.message.audio
+    file_id = audio.file_id
+    file_path = context.bot.get_file(file_id).file_path
+
+    # Download the audio file
+    file = context.bot.download_file(file_path)
+
+    # Specify the storage path
+    storage_path = os.path.join('audio_storage', f'{file_id}.ogg')
+
+    # Save the audio file
+    with open(storage_path, 'wb') as f:
+        f.write(file)
+
+    # Extract metadata using pydub
+    audio_info = mediainfo(storage_path)
+    artist = audio_info['TAG']['artist']
+    song_name = audio_info['TAG']['title']
+
+    # Do any additional processing or handling of the audio file here
+    # ...
+
+    # Send a response with the extracted metadata
+    response = f"Audio received:\nArtist: {artist}\nSong Name: {song_name}"
+    update.message.reply_text(response)
+
+
 def main() -> None:
     app = Application.builder().token(TOKEN).build()
 
@@ -144,6 +175,7 @@ def main() -> None:
     app.add_handler(conversation_handler)
 
     app.add_handler(CommandHandler("help", help_command))
+    app.add_handler(CommandHandler("audio_info", audio_info))
     # app.run()
     app.run_polling()
 
