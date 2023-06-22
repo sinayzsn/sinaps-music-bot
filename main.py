@@ -15,21 +15,17 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO, filename='bot.log'
 )
 logger = logging.getLogger(__name__)
-
 TOKEN: Final = KEY.BOT_TOKEN
 BOT_USERNAME: Final = KEY.BOT_ID
 GROUP: Final = KEY.GROUP_CHAT_id
 genre = [["POP", "ROCK", "RAP", "METAL", "COUNTRY", "ALT_METAL"]]
 topics = {
-    "ROCK": 38,
-    "METAL": 47,
-    "POP": 52,
-    "RAP": 54,
-    "COUNTRY": 56,
-    "ALT_METAL": 58
-
-
-
+    "ROCK": KEY.TOPIC['ROCK'],
+    "METAL": KEY.TOPIC['METAL'],
+    "POP": KEY.TOPIC['POP'],
+    "RAP": KEY.TOPIC['RAP'],
+    "COUNTRY": KEY.TOPIC['COUNTRY'],
+    "ALT_METAL": KEY.TOPIC['ALT_METAL']
 }
 GENRE, CATEGORIZE_SONG = range(2)
 
