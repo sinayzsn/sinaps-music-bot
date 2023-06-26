@@ -30,7 +30,7 @@ topics = {
     "COUNTRY": KEY.TOPIC['COUNTRY'],
     "ALT_METAL": KEY.TOPIC['ALT_METAL']
 }
-GENRE, CATEGORIZE_SONG = range(2)
+GENRE, CATEGORIZE_SONG, AUDIO_INFO = range(3)
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -65,7 +65,8 @@ async def genre_selection(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
                 genre, one_time_keyboard=True, input_field_placeholder="Please choose"
             )
         )
-        return CATEGORIZE_SONG
+        # return CATEGORIZE_SONG
+        return AUDIO_INFO
     else:
         await message.reply_text("This bot only accepts audio files")
         return GENRE
@@ -133,33 +134,37 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(help_msg)
 
 
-def audio_info(update, context):
-    audio = update.message.audio
-    file_id = audio.file_id
-    file_path = context.bot.get_file(file_id).file_path
+async def get_audio_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # TODO: I need to get the audio ID, Download it, and then get the metadata from it.
+    #   after that I have to return the data (artist, audio name) from the metadata.
+    message = update.message
+    context.user_data["audio_message_id"] = message.message_id
 
-    # Download the audio file
-    file = context.bot.download_file(file_path)
+    if message.audio is not None:
+        audio_message_id = context.user_data.get("audio_message_id")
 
-    # Specify the storage path
-    storage_path = os.path.join('audio_storage', f'{file_id}.ogg')
-
-    # Save the audio file
-    with open(storage_path, 'wb') as f:
-        f.write(file)
-
-    # Extract metadata using pydub
-    audio_info = mediainfo(storage_path)
-    artist = audio_info['TAG']['artist']
-    song_name = audio_info['TAG']['title']
-
-    # Do any additional processing or handling of the audio file here
-    # ...
-
-    # Send a response with the extracted metadata
-    response = f"Audio received:\nArtist: {artist}\nSong Name: {song_name}"
-    update.message.reply_text(response)
-
+        # if audio_message_id:
+            # TODO: Download the audio file based on the audio file ID.
+            #   Store the file and use this method to get the song artist and name.
+            #   Then send the audio artist and name to users.
+        #     storage_path = os.path.join('audio_storage', f'{file_id}.ogg')
+        #
+        #     # Save the audio file
+        #     with open(storage_path, 'wb') as f:
+        #         f.write(file)
+        #
+        #     # Extract metadata using pydub
+        #     audio_info = mediainfo(storage_path)
+        #     artist = audio_info['TAG']['artist']
+        #     song_name = audio_info['TAG']['title']
+        #
+        #     # Do any additional processing or handling of the audio file here
+        #     # ...
+        #
+        #     # Send a response with the extracted metadata
+        #     response = f"Audio received:\nArtist: {artist}\nSong Name: {song_name}"
+    else:
+        await message.reply_text("This bot only accepts audio files")
 
 def main() -> None:
     app = Application.builder().token(TOKEN).build()
@@ -168,14 +173,14 @@ def main() -> None:
         entry_points=[CommandHandler("start", start)],
         states={
             GENRE: [MessageHandler(filters.AUDIO, genre_selection)],
-            CATEGORIZE_SONG: [MessageHandler(filters.TEXT, categorize_song)],
+            # CATEGORIZE_SONG: [MessageHandler(filters.TEXT, categorize_song)],
+            AUDIO_INFO: [MessageHandler(filters.AUDIO, get_audio_info)]
         },
         fallbacks=[CommandHandler("cancel", cancel)],
     )
     app.add_handler(conversation_handler)
 
     app.add_handler(CommandHandler("help", help_command))
-    app.add_handler(CommandHandler("audio_info", audio_info))
     # app.run()
     app.run_polling()
 
