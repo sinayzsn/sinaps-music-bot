@@ -31,8 +31,8 @@ topics = {
     "COUNTRY": KEY.TOPIC['COUNTRY'],
     "ALT_METAL": KEY.TOPIC['ALT_METAL']
 }
-GENRE, CATEGORIZE_SONG, AUDIO_INFO = range(3)
-
+# GENRE, CATEGORIZE_SONG, AUDIO_INFO = range(3)
+GENRE, CATEGORIZE_SONG= range(2)
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Starts the conversation and asks the user to send a AUDIO file."""
