@@ -54,6 +54,7 @@ async def genre_selection(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         in the genre variable.
     3. The user would choose between the available options and the next function would be called.
     """
+    logger.info("genre_selection function starting")
     message = update.message
 
     if message.audio is not None:
@@ -71,9 +72,11 @@ async def genre_selection(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             )
         )
         # return CATEGORIZE_SONG
+        logger.info("genre_selection with success")
         return AUDIO_INFO
     else:
         await message.reply_text("This bot only accepts audio files")
+        logger.error("genre_selection with an error")
         return GENRE
 
 
@@ -87,11 +90,12 @@ async def categorize_song(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     if the message id is NONE it prints (No audio file found.)
     and if none
     """
+    logger.info("categorize_song function called")
     chosen_genre = update.message.text
     user_id = update.effective_user.id
 
     if chosen_genre in topics:
-        destination_thread_id = topics[chosen_genre]
+        destination_thread_id = KEY.TOPIC[chosen_genre]
 
         # Retrieve the audio message ID from user_data
         audio_message_ids = context.user_data.get("audio_message_ids", [])
@@ -111,6 +115,7 @@ async def categorize_song(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     else:
         await update.message.reply_text("Invalid genre.")
 
+    logger.info("categorize_song function ended successfully")
     return GENRE
 
 
