@@ -70,9 +70,10 @@ async def genre_selection(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
                 genre, one_time_keyboard=True, input_field_placeholder="Please choose"
             )
         )
-        # return CATEGORIZE_SONG
+
         logger.info("genre_selection with success")
-        return AUDIO_INFO
+        return CATEGORIZE_SONG
+        # return AUDIO_INFO
     else:
         await message.reply_text("This bot only accepts audio files")
         logger.error("genre_selection with an error")
