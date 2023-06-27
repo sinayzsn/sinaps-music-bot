@@ -1,4 +1,5 @@
-from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
+import telegram
+from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, File
 from telegram.ext import (
     Application,
     CommandHandler,
@@ -56,8 +57,12 @@ async def genre_selection(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     message = update.message
 
     if message.audio is not None:
-        # Save the audio message ID
-        context.user_data["audio_message_id"] = message.message_id
+        # Save the audio message ID. This method can only store one message id at a time.
+        # context.user_data["audio_message_id"] = message.message_id
+
+        # In this method unlike the above method it can store multiple messages id's. That would be used
+        # later to forward them.
+        context.user_data.setdefault("audio_message_ids", []).append(message.message_id)
 
         await message.reply_text(
             "Please choose a genre:",
@@ -89,16 +94,17 @@ async def categorize_song(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         destination_thread_id = topics[chosen_genre]
 
         # Retrieve the audio message ID from user_data
-        audio_message_id = context.user_data.get("audio_message_id")
+        audio_message_ids = context.user_data.get("audio_message_ids", [])
 
-        if audio_message_id:
-            await context.bot.forward_message(
-                chat_id=GROUP,
-                from_chat_id=user_id,
-                message_id=audio_message_id,
-                message_thread_id=destination_thread_id
-            )
-            await update.message.reply_text("Song categorized successfully!")
+        if audio_message_ids:
+            for message_id in audio_message_ids:
+                await context.bot.forward_message(
+                    chat_id=GROUP,
+                    from_chat_id=user_id,
+                    message_id=message_id,
+                    message_thread_id=destination_thread_id
+                )
+                await update.message.reply_text("Song categorized successfully!")
         else:
             await update.message.reply_text("No audio file found.")
     else:
@@ -138,15 +144,23 @@ async def get_audio_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # TODO: I need to get the audio ID, Download it, and then get the metadata from it.
     #   after that I have to return the data (artist, audio name) from the metadata.
     message = update.message
-    context.user_data["audio_message_id"] = message.message_id
+    # context.user_data["audio_message_id"] = message.message_id
+    audio_message_ids = context.user_data.get("audio_message_ids", [])
 
     if message.audio is not None:
         audio_message_id = context.user_data.get("audio_message_id")
 
-        # if audio_message_id:
+        if audio_message_id:
             # TODO: Download the audio file based on the audio file ID.
             #   Store the file and use this method to get the song artist and name.
             #   Then send the audio artist and name to users.
+            for audio_message_id in audio_message_ids:
+                File(file_id=audio_message_id, file_path=f"./{audio_message_id}")
+                audio_info = mediainfo(audio_message_id)
+                artist = audio_info['TAG']['artist']
+                song_name = audio_info['TAG']['title']
+                response = f"Audio received:\nArtist: {artist}\nSong Name: {song_name}"
+                await update.message.reply_text(response)
         #     storage_path = os.path.join('audio_storage', f'{file_id}.ogg')
         #
         #     # Save the audio file
