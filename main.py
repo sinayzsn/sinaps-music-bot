@@ -16,8 +16,7 @@ from pydub import AudioSegment
 from pydub.utils import mediainfo
 
 logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO, filename='bot.log'
-)
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
 TOKEN: Final = KEY.BOT_TOKEN
 BOT_USERNAME: Final = KEY.BOT_ID
