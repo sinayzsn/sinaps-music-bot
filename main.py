@@ -72,7 +72,7 @@ async def genre_selection(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         )
 
         logger.info("genre_selection with success")
-        return CATEGORIZE_SONG
+        # return CATEGORIZE_SONG
         # return AUDIO_INFO
     else:
         await message.reply_text("This bot only accepts audio files")
@@ -110,6 +110,7 @@ async def categorize_song(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
                     message_thread_id=destination_thread_id
                 )
                 await update.message.reply_text("Song categorized successfully!")
+                audio_message_ids.clear()
         else:
             await update.message.reply_text("No audio file found.")
     else:
