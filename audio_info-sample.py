@@ -1,4 +1,16 @@
-def handle_audio(update, context):
+import os
+from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
+from telegram.ext import (
+    Application,
+    CommandHandler,
+    MessageHandler,
+    filters,
+    ConversationHandler,
+    ContextTypes
+)from pydub.utils import mediainfo
+
+
+def handle_audio(update: Update, context: ContextTypes.DEFAULT_TYPE):
     audio = update.message.audio
     file_id = audio.file_id
     file_path = context.bot.get_file(file_id).file_path
@@ -24,3 +36,14 @@ def handle_audio(update, context):
     # Send a response with the extracted metadata
     response = f"Audio received:\nArtist: {artist}\nSong Name: {song_name}"
     update.message.reply_text(response)
+
+
+bot_token = 'YOUR_BOT_TOKEN'
+
+# updater = Updater(bot_token, use_context=True)
+# dispatcher = updater.dispatcher
+#
+# audio_handler = MessageHandler(Filters.audio, handle_audio)
+# dispatcher.add_handler(audio_handler)
+#
+# updater.start_polling()
