@@ -8,7 +8,7 @@ from telegram.ext import (
     ContextTypes
 )
 import logging
-import environments as KEY
+import env as KEY
 from typing import Final
 
 logging.basicConfig(
