@@ -22,14 +22,14 @@ TOKEN: Final = KEY.BOT_TOKEN
 BOT_USERNAME: Final = KEY.BOT_ID
 GROUP: Final = KEY.GROUP_CHAT_id
 genre = [["POP", "ROCK", "RAP", "METAL", "COUNTRY", "ALT_METAL"]]
-topics = {
-    "ROCK": KEY.TOPIC['ROCK'],
-    "METAL": KEY.TOPIC['METAL'],
-    "POP": KEY.TOPIC['POP'],
-    "RAP": KEY.TOPIC['RAP'],
-    "COUNTRY": KEY.TOPIC['COUNTRY'],
-    "ALT_METAL": KEY.TOPIC['ALT_METAL']
-}
+# topics = {
+#     "ROCK": KEY.TOPIC['ROCK'],
+#     "METAL": KEY.TOPIC['METAL'],
+#     "POP": KEY.TOPIC['POP'],
+#     "RAP": KEY.TOPIC['RAP'],
+#     "COUNTRY": KEY.TOPIC['COUNTRY'],
+#     "ALT_METAL": KEY.TOPIC['ALT_METAL']
+# }
 # GENRE, CATEGORIZE_SONG, AUDIO_INFO = range(3)
 GENRE, CATEGORIZE_SONG= range(2)
 
@@ -58,11 +58,11 @@ async def genre_selection(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
     if message.audio is not None:
         # Save the audio message ID. This method can only store one message id at a time.
-        context.user_data["audio_message_ids"] = message.message_id
+        # context.user_data["audio_message_ids"] = message.message_id
 
         # In this method unlike the above method it can store multiple messages id's. That would be used
         # later to forward them.
-        # context.user_data.setdefault("audio_message_ids", []).append(message.message_id)
+        context.user_data.setdefault("audio_message_ids", []).append(message.message_id)
         logger.info("Getting the message Id's")
         logger.info(context.user_data.get("audio_message_ids"))
         await message.reply_text(
