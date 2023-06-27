@@ -95,7 +95,7 @@ async def categorize_song(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     chosen_genre = update.message.text
     user_id = update.effective_user.id
 
-    if chosen_genre in topics:
+    if chosen_genre in KEY.TOPIC:
         destination_thread_id = KEY.TOPIC[chosen_genre]
 
         # Retrieve the audio message ID from user_data
