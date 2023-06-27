@@ -58,13 +58,13 @@ async def genre_selection(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
     if message.audio is not None:
         # Save the audio message ID. This method can only store one message id at a time.
-        # context.user_data["audio_message_id"] = message.message_id
+        context.user_data["audio_message_id"] = message.message_id
 
         # In this method unlike the above method it can store multiple messages id's. That would be used
         # later to forward them.
-        context.user_data.setdefault("audio_message_ids", []).append(message.message_id)
+        # context.user_data.setdefault("audio_message_ids", []).append(message.message_id)
         logger.info("Getting the message Id's")
-        logger.info(context.user_data.get("audio_message_ids", []))
+        logger.info(context.user_data.get("audio_message_ids"))
         await message.reply_text(
             "Please choose a genre:",
             reply_markup=ReplyKeyboardMarkup(
@@ -99,7 +99,7 @@ async def categorize_song(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         destination_thread_id = KEY.TOPIC[chosen_genre]
 
         # Retrieve the audio message ID from user_data
-        audio_message_ids = context.user_data.get("audio_message_ids", [])
+        audio_message_ids = context.user_data.get("audio_message_ids")
 
         if audio_message_ids:
             for message_id in audio_message_ids:
