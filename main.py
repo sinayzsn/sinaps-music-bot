@@ -63,14 +63,14 @@ async def genre_selection(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
         # In this method unlike the above method it can store multiple messages id's. That would be used
         # later to forward them.
-        # context.user_data.setdefault("audio_message_ids", []).append(message.message_id)
+        context.user_data.setdefault("audio_message_ids", []).append(message.message_id)
         print(context.user_data["audio_message_ids"])
         # for ids in message.message_id:
         #     splited = ids.split("")
         #     # context.user_data.setdefault("audio_message_ids", []).append(ids)
         #     id_of_songs.append(splited)
         logger.info("Getting the message Id's")
-        logger.info(context.user_data["audio_message_ids"])
+        logger.info(context.user_data.setdefault("audio_message_ids", []))
         await message.reply_text(
             "Please choose a genre:",
             reply_markup=ReplyKeyboardMarkup(
