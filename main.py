@@ -67,6 +67,7 @@ async def genre_selection(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         audio_message_ids.append(message.message_id)
         context.bot_data["audio_message_ids"] = audio_message_ids
         logger.info("Getting the message Id's")
+        logger.debug(f"the message Id's are --> {audio_message_ids}")
         await message.reply_text(
             "Please choose a genre:",
             reply_markup=ReplyKeyboardMarkup(
@@ -113,7 +114,7 @@ async def categorize_song(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
                     message_thread_id=destination_thread_id
                 )
                 await update.message.reply_text("Song categorized successfully!")
-                audio_message_ids.clear()
+            audio_message_ids.clear()
         else:
             await update.message.reply_text("No audio file found.")
     else:
