@@ -59,12 +59,12 @@ async def genre_selection(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
     if message.audio is not None:
         # Save the audio message ID. This method can only store one message id at a time.
-        # context.user_data["audio_message_ids"] = message.message_id
+        context.user_data["audio_message_ids"] = message.message_id
 
         # In this method unlike the above method it can store multiple messages id's. That would be used
         # later to forward them.
         # context.user_data.setdefault("audio_message_ids", []).append(message.message_id)
-        print(message.message_id)
+        print(context.user_data["audio_message_ids"])
         # for ids in message.message_id:
         #     splited = ids.split("")
         #     # context.user_data.setdefault("audio_message_ids", []).append(ids)
