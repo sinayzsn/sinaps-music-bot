@@ -65,7 +65,7 @@ async def genre_selection(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         # later to forward them.
         audio_message_ids = context.user_data.get("audio_message_ids", [])
         audio_message_ids.append(message.message_id)
-        context.user_data["audio_message_ids"] = audio_message_ids
+        context.bot_data["audio_message_ids"] = audio_message_ids
         logger.info("Getting the message Id's")
         await message.reply_text(
             "Please choose a genre:",
