@@ -102,7 +102,7 @@ async def categorize_song(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         destination_thread_id = KEY.TOPIC[chosen_genre]
 
         # Retrieve the audio message ID from user_data
-        audio_message_ids = context.user_data.get("audio_message_ids", [])
+        audio_message_ids = context.bot_data.get("audio_message_ids", [])
 
         if audio_message_ids:
             for message_id in audio_message_ids:
