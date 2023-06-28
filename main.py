@@ -70,7 +70,7 @@ async def genre_selection(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         #     # context.user_data.setdefault("audio_message_ids", []).append(ids)
         #     id_of_songs.append(splited)
         logger.info("Getting the message Id's")
-        logger.info(id_of_songs)
+        logger.info(context.user_data["audio_message_ids"])
         await message.reply_text(
             "Please choose a genre:",
             reply_markup=ReplyKeyboardMarkup(
