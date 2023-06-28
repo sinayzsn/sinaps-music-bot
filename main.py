@@ -31,7 +31,8 @@ genre = [["POP", "ROCK", "RAP", "METAL", "COUNTRY", "ALT_METAL"]]
 #     "ALT_METAL": KEY.TOPIC['ALT_METAL']
 # }
 # GENRE, CATEGORIZE_SONG, AUDIO_INFO = range(3)
-GENRE, CATEGORIZE_SONG= range(2)
+GENRE, CATEGORIZE_SONG = range(2)
+id_of_songs = []
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Starts the conversation and asks the user to send a AUDIO file."""
@@ -63,8 +64,7 @@ async def genre_selection(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         # In this method unlike the above method it can store multiple messages id's. That would be used
         # later to forward them.
         # context.user_data.setdefault("audio_message_ids", []).append(message.message_id)
-        id_of_songs = []
-        for ids in message.message_ids:
+        for ids in message.message_id:
             # context.user_data.setdefault("audio_message_ids", []).append(ids)
             id_of_songs.append(ids)
         logger.info("Getting the message Id's")
@@ -106,7 +106,7 @@ async def categorize_song(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         audio_message_ids = context.user_data.get("audio_message_ids", [])
 
         if audio_message_ids:
-            for message_id in audio_message_ids:
+            for message_id in id_of_songs:
                 await context.bot.forward_message(
                     chat_id=GROUP,
                     from_chat_id=user_id,
@@ -114,7 +114,7 @@ async def categorize_song(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
                     message_thread_id=destination_thread_id
                 )
                 await update.message.reply_text("Song categorized successfully!")
-                audio_message_ids.clear()
+                id_of_songs.clear()
         else:
             await update.message.reply_text("No audio file found.")
     else:
