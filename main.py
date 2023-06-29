@@ -32,7 +32,8 @@ genre = [["POP", "ROCK", "RAP", "METAL", "COUNTRY", "ALT_METAL"]]
 # }
 # GENRE, CATEGORIZE_SONG, AUDIO_INFO = range(3)
 GENRE, CATEGORIZE_SONG = range(2)
-# id_of_songs = []
+id_of_songs = []
+
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Starts the conversation and asks the user to send a AUDIO file."""
@@ -63,11 +64,11 @@ async def genre_selection(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
         # In this method unlike the above method it can store multiple messages id's. That would be used
         # later to forward them.
-        audio_message_ids = context.user_data.get("audio_message_ids", [])
-        audio_message_ids.append(message.message_id)
-        context.bot_data["audio_message_ids"] = audio_message_ids
-        logger.info("Getting the message Id's")
-        logger.debug(f"the message Id's are --> {audio_message_ids}")
+        id_to_str = str(message.message_id)
+        for ids in id_to_str:
+            id_of_songs.append(ids)
+        logger.info(f"the id list is {id_of_songs}")
+
         await message.reply_text(
             "Please choose a genre:",
             reply_markup=ReplyKeyboardMarkup(
