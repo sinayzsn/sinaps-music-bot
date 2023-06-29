@@ -64,7 +64,7 @@ async def genre_selection(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
         # In this method unlike the above method it can store multiple messages id's. That would be used
         # later to forward them.
-        id_of_songs.append(Update.message.message_id)
+        id_of_songs.append(update.message.message_id)
         logger.info(f"the id list is {id_of_songs}")
 
         await message.reply_text(
