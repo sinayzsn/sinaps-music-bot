@@ -57,15 +57,15 @@ async def genre_selection(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     """
     logger.info("genre_selection function starting")
     message = update.message
-
+    id_of_songs.append(update.message.message_id)
+    logger.info(f"the id list is {id_of_songs}")
     if message.audio is not None:
         # Save the audio message ID. This method can only store one message id at a time.
         # context.user_data["audio_message_ids"] = message.message_id
 
         # In this method unlike the above method it can store multiple messages id's. That would be used
         # later to forward them.
-        id_of_songs.append(update.message.message_id)
-        logger.info(f"the id list is {id_of_songs}")
+
 
         await message.reply_text(
             "Please choose a genre:",
