@@ -1,5 +1,5 @@
 import telegram
-from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, File, Bot
+from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, File, MessageId
 from telegram.ext import (
     Application,
     CommandHandler,
@@ -60,7 +60,7 @@ async def genre_selection(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     # id_of_songs.append(update.message.message_id)
     # getup = bot.get_updates()
     song_id = update.message.id_attrs[0]
-    logger.info(f"the id list is {song_id}")
+    logger.info(f"the id list is {MessageId}")
     if message.audio is not None:
         # Save the audio message ID. This method can only store one message id at a time.
         # context.user_data["audio_message_ids"] = message.message_id
