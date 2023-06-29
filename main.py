@@ -1,5 +1,5 @@
 import telegram
-from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, File
+from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, File, Bot
 from telegram.ext import (
     Application,
     CommandHandler,
@@ -33,7 +33,7 @@ genre = [["POP", "ROCK", "RAP", "METAL", "COUNTRY", "ALT_METAL"]]
 # GENRE, CATEGORIZE_SONG, AUDIO_INFO = range(3)
 GENRE, CATEGORIZE_SONG = range(2)
 id_of_songs = []
-
+bot = Bot(token=f"{KEY.BOT_TOKEN}")
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Starts the conversation and asks the user to send a AUDIO file."""
@@ -58,7 +58,9 @@ async def genre_selection(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     logger.info("genre_selection function starting")
     message = update.message
     # id_of_songs.append(update.message.message_id)
-    logger.info(f"the id list is {context.message.message_id}")
+    getup = bot.get_updates()
+    song_id = getup[-1].message.message_id
+    logger.info(f"the id list is {song_id}")
     if message.audio is not None:
         # Save the audio message ID. This method can only store one message id at a time.
         # context.user_data["audio_message_ids"] = message.message_id
