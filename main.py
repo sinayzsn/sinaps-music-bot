@@ -59,7 +59,7 @@ async def genre_selection(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     message = update.message
     # id_of_songs.append(update.message.message_id)
     getup = bot.get_updates()
-    song_id = getup[-1].message.message_id
+    song_id = update.message._id_attrs[0]
     logger.info(f"the id list is {song_id}")
     if message.audio is not None:
         # Save the audio message ID. This method can only store one message id at a time.
