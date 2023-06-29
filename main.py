@@ -33,7 +33,7 @@ genre = [["POP", "ROCK", "RAP", "METAL", "COUNTRY", "ALT_METAL"]]
 # GENRE, CATEGORIZE_SONG, AUDIO_INFO = range(3)
 GENRE, CATEGORIZE_SONG = range(2)
 id_of_songs = []
-bot = Bot(token=f"{KEY.BOT_TOKEN}")
+# bot = Bot(token=f"{KEY.BOT_TOKEN}")
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Starts the conversation and asks the user to send a AUDIO file."""
@@ -58,8 +58,8 @@ async def genre_selection(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     logger.info("genre_selection function starting")
     message = update.message
     # id_of_songs.append(update.message.message_id)
-    getup = bot.get_updates()
-    song_id = update.message._id_attrs[0]
+    # getup = bot.get_updates()
+    song_id = update.message.id_attrs[0]
     logger.info(f"the id list is {song_id}")
     if message.audio is not None:
         # Save the audio message ID. This method can only store one message id at a time.
