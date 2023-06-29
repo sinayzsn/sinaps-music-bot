@@ -66,6 +66,7 @@ async def genre_selection(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         for i in msgid_to_str:
             context.user_data["audio_message_ids"] = i
             print(context.bot_data.get("audio_message_ids"))
+            print(i)
         # In this method unlike the above method it can store multiple messages id's. That would be used
         # later to forward them.
 
