@@ -1,5 +1,4 @@
-import telegram
-from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, File, MessageId
+from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, File
 from telegram.ext import (
     Application,
     CommandHandler,
@@ -22,18 +21,9 @@ TOKEN: Final = KEY.BOT_TOKEN
 BOT_USERNAME: Final = KEY.BOT_ID
 GROUP: Final = KEY.GROUP_CHAT_id
 genre = [["POP", "ROCK", "RAP", "METAL", "COUNTRY", "ALT_METAL"]]
-# topics = {
-#     "ROCK": KEY.TOPIC['ROCK'],
-#     "METAL": KEY.TOPIC['METAL'],
-#     "POP": KEY.TOPIC['POP'],
-#     "RAP": KEY.TOPIC['RAP'],
-#     "COUNTRY": KEY.TOPIC['COUNTRY'],
-#     "ALT_METAL": KEY.TOPIC['ALT_METAL']
-# }
-# GENRE, CATEGORIZE_SONG, AUDIO_INFO = range(3)
-GENRE, CATEGORIZE_SONG = range(2)
-id_of_songs = []
-# bot = Bot(token=f"{KEY.BOT_TOKEN}")
+
+GENRE, CATEGORIZE_SONG, AUDIO_INFO = range(3)
+
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Starts the conversation and asks the user to send a AUDIO file."""
@@ -57,13 +47,9 @@ async def genre_selection(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     """
     # logger.info("genre_selection function starting")
     message = update.message
-
-    if message.audio is not None:
-        # Save the audio message ID. This method can only store one message id at a time.
-        # context.user_data["audio_message_ids"] = message.message_id
-        # context.user_data("audio_message_ids", []).append(message.message_id)
-        if message.audio:
-            print(message.message_id)
+    if message.audio:
+        context.user_data["audio_message_id"] = message.message_id
+        print(context.user_data.get("audio_message_id"))
 
         # In this method unlike the above method it can store multiple messages id's. That would be used
         # later to forward them.
@@ -74,8 +60,6 @@ async def genre_selection(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
                 genre, one_time_keyboard=True, input_field_placeholder="Please choose"
             )
         )
-        # context.user_data.setdefault("audio_message_ids", []).append(message.message_id)
-        # logger.info(context.user_data.setdefault("audio_message_ids", []))
         logger.info("genre_selection with success")
         return CATEGORIZE_SONG
         # return AUDIO_INFO
@@ -95,26 +79,25 @@ async def categorize_song(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     if the message id is NONE it prints (No audio file found.)
     and if none
     """
-    logger.info("categorize_song function called")
+    # logger.info("categorize_song function called")
     chosen_genre = update.message.text
+    message = update.message
     user_id = update.effective_user.id
 
     if chosen_genre in KEY.TOPIC:
         destination_thread_id = KEY.TOPIC[chosen_genre]
 
         # Retrieve the audio message ID from user_data
-        audio_message_ids = context.bot_data.get("audio_message_ids", [])
-
-        if audio_message_ids:
-            for message_id in audio_message_ids:
-                await context.bot.forward_message(
-                    chat_id=GROUP,
-                    from_chat_id=user_id,
-                    message_id=message_id,
-                    message_thread_id=destination_thread_id
-                )
-                await update.message.reply_text("Song categorized successfully!")
-            audio_message_ids.clear()
+        audio_message_id = context.user_data.get("audio_message_id")
+        print(f"Second one: {audio_message_id}")
+        if audio_message_id is not None:
+            await context.bot.forward_message(
+                chat_id=GROUP,
+                from_chat_id=user_id,
+                message_id=audio_message_id,
+                message_thread_id=destination_thread_id
+            )
+            await update.message.reply_text("Song categorized successfully!")
         else:
             await update.message.reply_text("No audio file found.")
     else:
@@ -122,6 +105,20 @@ async def categorize_song(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
     logger.info("categorize_song function ended successfully")
     return GENRE
+
+
+async def get_audio_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    message = update.message
+    audio_message_id = context.user_data.get("audio_message_id")
+    if message.audio is not None:
+        file = await context.bot.get_file(audio_message_id)
+        await file.download_to_drive(message.audio.file_name)
+        audio_info = mediainfo(message.audio.file_name)
+        artist = audio_info['TAG']['artist']
+        song_name = audio_info['TAG']['title']
+        await message.reply_text(f"The artist and the song name are: \nArtist: {artist}\nSong Name: {song_name}")
+    else:
+        await message.reply_text("This bot only accepts audio files")
 
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -151,46 +148,6 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(help_msg)
 
 
-async def get_audio_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # TODO: I need to get the audio ID, Download it, and then get the metadata from it.
-    #   after that I have to return the data (artist, audio name) from the metadata.
-    message = update.message
-    # context.user_data["audio_message_id"] = message.message_id
-    audio_message_ids = context.user_data.get("audio_message_ids", [])
-
-    if message.audio is not None:
-        audio_message_id = context.user_data.get("audio_message_id")
-
-        if audio_message_id:
-            # TODO: Download the audio file based on the audio file ID.
-            #   Store the file and use this method to get the song artist and name.
-            #   Then send the audio artist and name to users.
-            for audio_message_id in audio_message_ids:
-                File(file_id=audio_message_id, file_path=f"./{audio_message_id}")
-                audio_info = mediainfo(audio_message_id)
-                artist = audio_info['TAG']['artist']
-                song_name = audio_info['TAG']['title']
-                response = f"Audio received:\nArtist: {artist}\nSong Name: {song_name}"
-                await update.message.reply_text(response)
-        #     storage_path = os.path.join('audio_storage', f'{file_id}.ogg')
-        #
-        #     # Save the audio file
-        #     with open(storage_path, 'wb') as f:
-        #         f.write(file)
-        #
-        #     # Extract metadata using pydub
-        #     audio_info = mediainfo(storage_path)
-        #     artist = audio_info['TAG']['artist']
-        #     song_name = audio_info['TAG']['title']
-        #
-        #     # Do any additional processing or handling of the audio file here
-        #     # ...
-        #
-        #     # Send a response with the extracted metadata
-        #     response = f"Audio received:\nArtist: {artist}\nSong Name: {song_name}"
-    else:
-        await message.reply_text("This bot only accepts audio files")
-
 def main() -> None:
     app = Application.builder().token(TOKEN).build()
 
@@ -205,6 +162,7 @@ def main() -> None:
     )
     app.add_handler(conversation_handler)
 
+    app.add_handler(CommandHandler("audio_info", get_audio_info))
     app.add_handler(CommandHandler("help", help_command))
     # app.run()
     app.run_polling()
