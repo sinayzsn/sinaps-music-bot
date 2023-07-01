@@ -1,49 +1,41 @@
-import os
-from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
+# import os
+from telegram import Update, Bot
 from telegram.ext import (
     Application,
-    CommandHandler,
     MessageHandler,
     filters,
-    ConversationHandler,
-    ContextTypes
-)from pydub.utils import mediainfo
+    ContextTypes,
+    Updater
+)
+# Need to install ffmpeg via "sudo apt install ffmpeg"
+from pydub.utils import mediainfo
+import env
+from typing import Final
 
 
-def handle_audio(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    audio = update.message.audio
-    file_id = audio.file_id
-    file_path = context.bot.get_file(file_id).file_path
-
-    # Download the audio file
-    file = context.bot.download_file(file_path)
-
-    # Specify the storage path
-    storage_path = os.path.join('audio_storage', f'{file_id}.ogg')
-
-    # Save the audio file
-    with open(storage_path, 'wb') as f:
-        f.write(file)
-
-    # Extract metadata using pydub
-    audio_info = mediainfo(storage_path)
-    artist = audio_info['TAG']['artist']
-    song_name = audio_info['TAG']['title']
-
-    # Do any additional processing or handling of the audio file here
-    # ...
-
-    # Send a response with the extracted metadata
-    response = f"Audio received:\nArtist: {artist}\nSong Name: {song_name}"
-    update.message.reply_text(response)
+TOKEN: Final = env.BOT_TOKEN
 
 
-bot_token = 'YOUR_BOT_TOKEN'
+async def get_audio_info(update: Update, context):
+    message = update.message
+    if message.audio:
+        file = await context.bot.get_file(message.audio)
+        await file.download_to_drive(message.audio.file_name)
+        audio_info = mediainfo(message.audio.file_name)
+        print(message.audio.file_name)
+        artist = audio_info['TAG']['artist']
+        song_name = audio_info['TAG']['title']
+        await message.reply_text(f"The artist and the song name are: \nArtist: {artist}\nSong Name: {song_name}")
 
-# updater = Updater(bot_token, use_context=True)
-# dispatcher = updater.dispatcher
-#
-# audio_handler = MessageHandler(Filters.audio, handle_audio)
-# dispatcher.add_handler(audio_handler)
-#
-# updater.start_polling()
+
+def main() -> None:
+    app = Application.builder().token(TOKEN).build()
+    # AUDIO_INFO = [MessageHandler(filters.AUDIO, handle_audio)]
+    app.add_handler(MessageHandler(filters.AUDIO, get_audio_info))
+    app.run_polling()
+
+
+if __name__ == '__main__':
+    print('Polling...')
+    # Run the bot
+    main()
